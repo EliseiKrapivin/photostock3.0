@@ -72,7 +72,7 @@ class PhotoDeleteView(UserIsSubmitter, DeleteView):
 class DownloadThumbnailView(DetailView):
     def get(self, request, pk):
         instance = get_object_or_404(Photo, pk=pk)
-        thumbnail_data = instance.image_thumbnail.read()
+        thumbnail_data = instance.thumbnail.read()
         
         response = HttpResponse(thumbnail_data, content_type='image/jpeg')
         response['Content-Disposition'] = f'attachment; filename="{instance.image.name}"'
@@ -87,11 +87,11 @@ class DownloadOriginalImageView(LoginRequiredMixin, DetailView):
         instance = get_object_or_404(Photo, pk=pk)
 
         author = self.request.user
-        uploaded_photos_count = Photo.objects.filter(author=author).count()
-        min_photos_required = 5
+        uploaded_photos_count = Photo.objects.filter(submitter=author).count()
+        min_photos_required = 3
 
         if uploaded_photos_count < min_photos_required:
-            messages.error(self.request, f'You need to upload {min_photos_required - uploaded_photos_count} more photo(s) before you can download original from the site.')
+            messages.error(self.request, f'You need to upload {min_photos_required-uploaded_photos_count} more photo(s) before you can download original from the site.')
             return redirect('photo:detail', pk=pk)
 
         original_image_data = instance.image.read()

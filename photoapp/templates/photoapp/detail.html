@@ -3,8 +3,8 @@
 {% block body %}
 <div class="mx-auto">
   <h1 class="text-center">{{ photo.title }}</h1>
-  <p class="text-center fw-light">Uploaded on: {{photo.created}} <br> By {{photo.submitter.username}}</p>
-  {% if user == photo.submitter %}
+  <p class="text-center fw-light">Uploaded on: {{photo.created}} <br> By {{photo.author.username}}</p>
+  {% if user == photo.author %}
     <p class="text-center">
       <span><a href="{% url 'photo:update' photo.id %}" class="text-primary px-2">Update</a></span>
       <span><a href="{% url 'photo:delete' photo.id %}" class="text-danger px-2">Delete</a></span>
@@ -23,6 +23,18 @@
       {% endfor %}
     </ul>
     <p>{{ photo.description }}</p>
+    <a href="{% url 'photo:download_thumbnail' pk=photo.id %}" class="btn btn-success mb-4">Download Thumbnail</a>
+    {% if messages %}
+    <p class="messages">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </p>
+    <style>
+      .messages { color: red; }
+    </style>
+{% endif %}
+    <a href="{% url 'photo:download_original' pk=photo.id %}" class="btn btn-success mb-4">Download Original</a>
   </div>
 </div>
 
