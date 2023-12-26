@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from .models import Photo
+from django.http import HttpResponse
+from django.contrib import messages
 
 class PhotoListView(ListView):
     model = Photo     
@@ -65,3 +67,37 @@ class PhotoDeleteView(UserIsSubmitter, DeleteView):
     template_name = 'photoapp/delete.html'
     model = Photo
     success_url = reverse_lazy('photo:list')      
+
+
+class DownloadThumbnailView(DetailView):
+    def get(self, request, pk):
+        instance = get_object_or_404(Photo, pk=pk)
+        thumbnail_data = instance.image_thumbnail.read()
+        
+        response = HttpResponse(thumbnail_data, content_type='image/jpeg')
+        response['Content-Disposition'] = f'attachment; filename="{instance.image.name}"'
+
+        return response
+
+
+class DownloadOriginalImageView(LoginRequiredMixin, DetailView):
+    login_url = '/login/'
+
+    def get(self, request, pk):
+        instance = get_object_or_404(Photo, pk=pk)
+
+        author = self.request.user
+        uploaded_photos_count = Photo.objects.filter(author=author).count()
+        min_photos_required = 5
+
+        if uploaded_photos_count < min_photos_required:
+            messages.error(self.request, f'You need to upload {min_photos_required - uploaded_photos_count} more photo(s) before you can download original from the site.')
+            return redirect('photo:detail', pk=pk)
+
+        original_image_data = instance.image.read()
+        
+        response = HttpResponse(original_image_data, content_type='image/jpeg')
+        response['Content-Disposition'] = f'attachment; filename="{instance.image.name}"'
+
+        return response
+

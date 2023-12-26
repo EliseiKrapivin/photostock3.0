@@ -18,8 +18,8 @@ class Photo(models.Model):
 
     tags = TaggableManager() 
 
-    thumbnail = ImageSpecField(source='avatar',
-                                      processors=[ResizeToFill(100, 50)],
+    thumbnail = ImageSpecField(source='image',
+                                      processors=[ResizeToFill(600, 360)],
                                       format='JPEG',
                                       options={'quality': 60})
 
