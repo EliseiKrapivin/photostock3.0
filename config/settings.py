@@ -38,7 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'taggit',
+    'crispy_forms',
+    'crispy_bootstrap4',
+    'imagekit',
+
     'photoapp',
+    'users',
+  
 ]
 
 TAGGIT_CASE_INSENSITIVE = True
@@ -58,7 +64,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,3 +135,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media/'
+
+USE_TZ = True
+
+LOGIN_URL = 'user:login'
+LOGIN_REDIRECT_URL = 'photo:list'
+
+LOGOUT_REDIRECT_URL = 'photo:list'
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
